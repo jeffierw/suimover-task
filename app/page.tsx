@@ -1,101 +1,198 @@
-import Image from "next/image";
+"use client";
+import {
+  ConnectButton,
+  useCurrentAccount,
+  useSignAndExecuteTransaction,
+} from "@mysten/dapp-kit";
+import { useState } from "react";
+import { Transaction } from "@mysten/sui/transactions";
+import type { Transaction as TX } from "@mysten/sui/transactions";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const currentAccount = useCurrentAccount();
+  const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
+  const [digest, setDigest] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  const getGoal = async (): Promise<TX | string> => {
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(true),
+        tx.pure.bool(true),
+        tx.pure.u64(2),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(false),
+        tx.pure.bool(true),
+        tx.pure.u64(1),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(true),
+        tx.pure.bool(true),
+        tx.pure.u64(2),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(false),
+        tx.pure.bool(false),
+        tx.pure.u64(1),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(true),
+        tx.pure.bool(true),
+        tx.pure.u64(2),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(false),
+        tx.pure.bool(true),
+        tx.pure.u64(2),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(true),
+        tx.pure.bool(false),
+        tx.pure.u64(1),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(false),
+        tx.pure.bool(true),
+        tx.pure.u64(2),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(true),
+        tx.pure.bool(true),
+        tx.pure.u64(2),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(false),
+        tx.pure.bool(true),
+        tx.pure.u64(3),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(true),
+        tx.pure.bool(false),
+        tx.pure.u64(3),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::walk`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.pure.bool(false),
+        tx.pure.bool(false),
+        tx.pure.u64(1),
+      ],
+    });
+    tx.moveCall({
+      target: `0xe283a855d889480c1e7ac1be37415a6fe4bcbfd79d1d648d45119bddd19da8e9::dougeon_easy::goal`,
+      arguments: [
+        tx.object(
+          "0x94eca7c3b73e0679ca14ba0626d8f045c1d53e9448bd5f31be64d138a7f8bf93"
+        ),
+        tx.object(
+          "0x068d5ff571b34d02fbe1cd0a8f748d496e3f626a4833bb238900e090343482e4"
+        ),
+        tx.object(
+          "0x6dcb26d7ab1a669421e050bb775c63a9f9c4d131c14722276eac5abd254e1e15"
+        ),
+      ],
+    });
+    return tx;
+  };
+  return (
+    <>
+      <ConnectButton className="p-2" />
+      <div className="flex flex-col items-center justify-center p-2 pb-20 gap-2 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+        {currentAccount && (
+          <>
+            <div>
+              <button
+                className="border p-2 round-full"
+                onClick={async () => {
+                  signAndExecuteTransaction(
+                    {
+                      transaction: await getGoal(),
+                    },
+                    {
+                      onSuccess: (result) => {
+                        console.log("executed transaction", result);
+                        setDigest(result.digest);
+                      },
+                    }
+                  );
+                }}
+              >
+                Sign and execute transaction
+              </button>
+            </div>
+            <div>Digest: {digest}</div>
+          </>
+        )}
+      </div>
+    </>
   );
 }
