@@ -3,15 +3,47 @@ import {
   ConnectButton,
   useCurrentAccount,
   useSignAndExecuteTransaction,
+  useSuiClient,
 } from "@mysten/dapp-kit";
 import { useState } from "react";
 import { Transaction } from "@mysten/sui/transactions";
 import type { Transaction as TX } from "@mysten/sui/transactions";
+import { bcs } from "@mysten/sui/bcs";
 
 export default function Home() {
   const currentAccount = useCurrentAccount();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
-  const [digest, setDigest] = useState("");
+  const [digest1, setDigest1] = useState("");
+  const [digest4, setDigest4] = useState("");
+  const client = useSuiClient();
+
+  const getSolve = async (): Promise<TX | string> => {
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `0x2ee85ec61775745b66bdc11039077c842db95a8cc736313a22fee6e5dc1798c1::beginner_village::solve`,
+      arguments: [
+        tx.object(
+          "0x068d5ff571b34d02fbe1cd0a8f748d496e3f626a4833bb238900e090343482e4"
+        ),
+        tx.object(
+          "0x6dcb26d7ab1a669421e050bb775c63a9f9c4d131c14722276eac5abd254e1e15"
+        ),
+        tx.pure.string("pest26"), // letter + number
+        tx.pure.u64(738), // (crew_index_u64 * 618 + 3140) / crew_index_u64  crew_index_u64: 26
+        tx.pure.bool(true), // crew.index() % 2 == 0
+      ],
+    });
+    if (currentAccount?.address) {
+      tx.setSender(currentAccount?.address);
+      const dryRunRes = await client.dryRunTransactionBlock({
+        transactionBlock: await tx.build({ client }),
+      });
+      if (dryRunRes.effects.status.status === "failure") {
+        console.log("test", dryRunRes.effects.status.error);
+      }
+    }
+    return tx;
+  };
 
   const getGoal = async (): Promise<TX | string> => {
     const tx = new Transaction();
@@ -170,26 +202,51 @@ export default function Home() {
         {currentAccount && (
           <>
             <div>
-              <button
-                className="border p-2 round-full"
-                onClick={async () => {
-                  signAndExecuteTransaction(
-                    {
-                      transaction: await getGoal(),
-                    },
-                    {
-                      onSuccess: (result) => {
-                        console.log("executed transaction", result);
-                        setDigest(result.digest);
+              <div>
+                <button
+                  className="border p-2 round-full"
+                  onClick={async () => {
+                    signAndExecuteTransaction(
+                      {
+                        transaction: await getSolve(),
                       },
-                    }
-                  );
-                }}
-              >
-                Sign and execute transaction
-              </button>
+                      {
+                        onSuccess: (result) => {
+                          console.log("executed transaction", result);
+                          setDigest1(result.digest);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  Sign and execute transaction task1
+                </button>
+              </div>
+              <div>Digest: {digest1}</div>
             </div>
-            <div>Digest: {digest}</div>
+            <div>
+              <div>
+                <button
+                  className="border p-2 round-full"
+                  onClick={async () => {
+                    signAndExecuteTransaction(
+                      {
+                        transaction: await getGoal(),
+                      },
+                      {
+                        onSuccess: (result) => {
+                          console.log("executed transaction", result);
+                          setDigest4(result.digest);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  Sign and execute transaction task4
+                </button>
+              </div>
+              <div>Digest: {digest4}</div>
+            </div>
           </>
         )}
       </div>
