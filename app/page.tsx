@@ -14,6 +14,7 @@ export default function Home() {
   const currentAccount = useCurrentAccount();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const [digest1, setDigest1] = useState("");
+  const [digest2, setDigest2] = useState("");
   const [digest4, setDigest4] = useState("");
   const client = useSuiClient();
 
@@ -33,6 +34,67 @@ export default function Home() {
         tx.pure.bool(true), // crew.index() % 2 == 0
       ],
     });
+    if (currentAccount?.address) {
+      tx.setSender(currentAccount?.address);
+      const dryRunRes = await client.dryRunTransactionBlock({
+        transactionBlock: await tx.build({ client }),
+      });
+      if (dryRunRes.effects.status.status === "failure") {
+        console.log("test", dryRunRes.effects.status.error);
+      }
+    }
+    return tx;
+  };
+
+  const getPirate = async (): Promise<TX | string> => {
+    const tx = new Transaction();
+    const tier = 100;
+    const EXERCISE_2_PACKAGE =
+      "0xb2b8178c2d44be7e42836681d774aa743d692b72e03f0b67224419e69510ecd6";
+    const myKapyCrew = tx.object(
+      "0x6dcb26d7ab1a669421e050bb775c63a9f9c4d131c14722276eac5abd254e1e15"
+    );
+    const pickaxeStore = tx.object(
+      "0x01a84f508b052c75b47f2ae42606ffbd9f1b86a265a5ec15682d3e9ad6bf1a89"
+    );
+    const correctMine = tx.object(
+      "0xd67c234e18cf8641208b05c74b268572e9a888fde5a3ce98928b52f1433a341b"
+    );
+    const kapyWorld = tx.object(
+      "0x068d5ff571b34d02fbe1cd0a8f748d496e3f626a4833bb238900e090343482e4"
+    );
+    // crew.index() % num_of_mines() != mine.index() 26 % 5 = 1
+    // 1. split coin to buy higher tier pickaxe
+    const [payment] = tx.splitCoins(tx.gas, [tier * 10]);
+    const [pickaxe] = tx.moveCall({
+      target: `${EXERCISE_2_PACKAGE}::pickaxe::buy`,
+      arguments: [pickaxeStore, tx.pure.u8(tier), payment],
+    });
+
+    // 2. eploit to get Ore.
+    const [ore] = tx.moveCall({
+      target: `${EXERCISE_2_PACKAGE}::mine::exploit`,
+      arguments: [correctMine, myKapyCrew, pickaxe],
+    });
+
+    // 3. destory pickaxe
+    tx.moveCall({
+      target: `${EXERCISE_2_PACKAGE}::pickaxe::destroy`,
+      arguments: [pickaxe],
+    });
+
+    // 4. forge the Ore to get Sword.
+    const [sword] = tx.moveCall({
+      target: `${EXERCISE_2_PACKAGE}::foundry::forge`,
+      arguments: [ore],
+    });
+
+    // 5. recruit the pirate with the sword.
+    tx.moveCall({
+      target: `${EXERCISE_2_PACKAGE}::swordsman_village::recurit`,
+      arguments: [kapyWorld, myKapyCrew, sword],
+    });
+
     if (currentAccount?.address) {
       tx.setSender(currentAccount?.address);
       const dryRunRes = await client.dryRunTransactionBlock({
@@ -223,6 +285,29 @@ export default function Home() {
                 </button>
               </div>
               <div>Digest: {digest1}</div>
+            </div>
+            <div>
+              <div>
+                <button
+                  className="border p-2 round-full"
+                  onClick={async () => {
+                    signAndExecuteTransaction(
+                      {
+                        transaction: await getPirate(),
+                      },
+                      {
+                        onSuccess: (result) => {
+                          console.log("executed transaction", result);
+                          setDigest2(result.digest);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  Sign and execute transaction task2
+                </button>
+              </div>
+              <div>Digest: {digest2}</div>
             </div>
             <div>
               <div>
