@@ -16,6 +16,11 @@ export default function Home() {
   const [digest1, setDigest1] = useState("");
   const [digest2, setDigest2] = useState("");
   const [digest4, setDigest4] = useState("");
+  const [digest5, setDigest5] = useState("");
+  const [digest6, setDigest6] = useState("");
+  const [digest7, setDigest7] = useState("");
+  const [digest8, setDigest8] = useState("");
+
   const client = useSuiClient();
 
   const getSolve = async (): Promise<TX | string> => {
@@ -257,6 +262,136 @@ export default function Home() {
     });
     return tx;
   };
+
+  const getSimpleNFT = async (): Promise<TX | string> => {
+    const tx = new Transaction();
+    const encoder = new TextEncoder();
+    const byteArray1 = encoder.encode("Simple NFT");
+    const byteArray2 = encoder.encode("This is my first nft.");
+    const byteArray3 = encoder.encode(
+      "https://raw.githubusercontent.com/Typus-Lab/typus-asset/refs/heads/main/logo.png"
+    );
+    tx.moveCall({
+      target: `0xbccf3732710974ca6ed41ee23e5328b9a6a63ee25ab0b1f25abeb6954a8467d1::simple_nft::mint_to_sender`,
+      arguments: [
+        tx.pure(bcs.vector(bcs.u8()).serialize(byteArray1)),
+        tx.pure(bcs.vector(bcs.u8()).serialize(byteArray2)),
+        tx.pure(bcs.vector(bcs.u8()).serialize(byteArray3)),
+        tx.pure(bcs.vector(bcs.string()).serialize(["icon", "owner", "color"])),
+        tx.pure(bcs.vector(bcs.string()).serialize(["Typus", "Pest", "black"])),
+      ],
+    });
+    return tx;
+  };
+
+  const getKiosk = async (): Promise<TX | string> => {
+    const tx = new Transaction();
+    // const encoder = new TextEncoder();
+    // const byteArray1 = encoder.encode("Simple NFT");
+    // const byteArray2 = encoder.encode("This is my first nft.");
+    // const byteArray3 = encoder.encode(
+    //   "https://raw.githubusercontent.com/Typus-Lab/typus-asset/refs/heads/main/logo.png"
+    // );
+
+    tx.moveCall({
+      target: `0x2::kiosk::default`,
+    });
+
+    // tx.moveCall({
+    //   target: `0x2::kiosk::borrow_val`,
+    //   typeArguments: [
+    //     "<0x27321bc52766f3ed3f809524ca0149bdbbf01f7f18bdccc261eab2dc5fa14589::mover_nft::Tails>",
+    //   ],
+    //   arguments: [Kiosk, KioskOwnerCap, Tails],
+    // });
+
+    return tx;
+  };
+
+  const getTypusNFT = async (): Promise<TX | string> => {
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `0x27321bc52766f3ed3f809524ca0149bdbbf01f7f18bdccc261eab2dc5fa14589::mover_nft::free_mint_into_kiosk`,
+      arguments: [
+        tx.object(
+          "0xbc583ae6c5a185ae1d74e7f979f0f57b3b579abc54b6d1141bf4f1889d98ec10"
+        ),
+        tx.object(
+          "0x9d7f0ec42b5b1b790c893f2679c4edc1efe1d5f20ca63cf23c2460b0042d74d8"
+        ),
+        tx.object(
+          "0xa31f8b44765952a1015360af08c65f9924ca0d3e0a65da7ce8337a6138fe5390"
+        ),
+        tx.object(
+          "0xb4a6aaba9a13526d151d099c675c54fc98ceedae5c62d9f58c3dca4a7875723e"
+        ),
+        tx.object(
+          "0x6e7eb56ac28de1408dd0470bf0e93317b535a3d41809bed75fcf9b85f0ec62c3"
+        ),
+        tx.object("0x8"),
+      ],
+    });
+    return tx;
+  };
+
+  const getGoal2 = async (): Promise<TX | string> => {
+    const tx = new Transaction();
+    const [res1, res2] = tx.moveCall({
+      target: `0x2::kiosk::borrow_val`,
+      typeArguments: [
+        "0x27321bc52766f3ed3f809524ca0149bdbbf01f7f18bdccc261eab2dc5fa14589::mover_nft::Tails",
+      ],
+      arguments: [
+        tx.object(
+          "0xb4a6aaba9a13526d151d099c675c54fc98ceedae5c62d9f58c3dca4a7875723e"
+        ),
+        tx.object(
+          "0x6e7eb56ac28de1408dd0470bf0e93317b535a3d41809bed75fcf9b85f0ec62c3"
+        ),
+        tx.object(
+          "0x31d8e1807cd200c82293394176aa417a69b43d914834f5fe4b1e841d511f0e4a"
+        ),
+      ],
+    });
+    const [res3] = tx.moveCall({
+      target: `0xfe6547fbe5b84f9638e88157c5b641a5d059119cb7a8283ff4a53c49b211d318::exercise::goal_2`,
+      arguments: [
+        tx.object(
+          "0x068d5ff571b34d02fbe1cd0a8f748d496e3f626a4833bb238900e090343482e4"
+        ),
+        tx.object(
+          "0x6dcb26d7ab1a669421e050bb775c63a9f9c4d131c14722276eac5abd254e1e15"
+        ),
+        tx.object(
+          "0xadbbdba13a09e7d1a5d52912acd3683b4104c0716f66038380d10b5d11f9d25c"
+        ),
+        res1,
+      ],
+    });
+    tx.moveCall({
+      target: `0x2::kiosk::return_val`,
+      typeArguments: [
+        "0x27321bc52766f3ed3f809524ca0149bdbbf01f7f18bdccc261eab2dc5fa14589::mover_nft::Tails",
+      ],
+      arguments: [
+        tx.object(
+          "0xb4a6aaba9a13526d151d099c675c54fc98ceedae5c62d9f58c3dca4a7875723e"
+        ),
+        res3,
+        res2,
+      ],
+    });
+    if (currentAccount?.address) {
+      tx.setSender(currentAccount?.address);
+      const dryRunRes = await client.dryRunTransactionBlock({
+        transactionBlock: await tx.build({ client }),
+      });
+      if (dryRunRes.effects.status.status === "failure") {
+        console.log("test", dryRunRes.effects.status.error);
+      }
+    }
+    return tx;
+  };
   return (
     <>
       <ConnectButton className="p-2" />
@@ -331,6 +466,98 @@ export default function Home() {
                 </button>
               </div>
               <div>Digest: {digest4}</div>
+            </div>
+            <div>
+              <div>
+                <button
+                  className="border p-2 round-full"
+                  onClick={async () => {
+                    signAndExecuteTransaction(
+                      {
+                        transaction: await getSimpleNFT(),
+                      },
+                      {
+                        onSuccess: (result) => {
+                          console.log("executed transaction", result);
+                          setDigest5(result.digest);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  Sign and execute transaction task5
+                </button>
+              </div>
+              <div>Digest: {digest5}</div>
+            </div>
+            <div>
+              <div>
+                <button
+                  className="border p-2 round-full"
+                  onClick={async () => {
+                    signAndExecuteTransaction(
+                      {
+                        transaction: await getKiosk(),
+                      },
+                      {
+                        onSuccess: (result) => {
+                          console.log("executed transaction", result);
+                          setDigest6(result.digest);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  Sign and execute transaction task6
+                </button>
+              </div>
+              <div>Digest: {digest6}</div>
+            </div>
+            <div>
+              <div>
+                <button
+                  className="border p-2 round-full"
+                  onClick={async () => {
+                    signAndExecuteTransaction(
+                      {
+                        transaction: await getTypusNFT(),
+                      },
+                      {
+                        onSuccess: (result) => {
+                          console.log("executed transaction", result);
+                          setDigest7(result.digest);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  Sign and execute transaction task7
+                </button>
+              </div>
+              <div>Digest: {digest7}</div>
+            </div>
+            <div>
+              <div>
+                <button
+                  className="border p-2 round-full"
+                  onClick={async () => {
+                    signAndExecuteTransaction(
+                      {
+                        transaction: await getGoal2(),
+                      },
+                      {
+                        onSuccess: (result) => {
+                          console.log("executed transaction", result);
+                          setDigest8(result.digest);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  Sign and execute transaction task8
+                </button>
+              </div>
+              <div>Digest: {digest8}</div>
             </div>
           </>
         )}
