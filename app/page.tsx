@@ -20,6 +20,9 @@ export default function Home() {
   const [digest6, setDigest6] = useState("");
   const [digest7, setDigest7] = useState("");
   const [digest8, setDigest8] = useState("");
+  const [digest9, setDigest9] = useState("");
+  const [digest10, setDigest10] = useState("");
+  const [digest11, setDigest11] = useState("");
 
   const client = useSuiClient();
 
@@ -392,6 +395,100 @@ export default function Home() {
     }
     return tx;
   };
+
+  const getKapyPirate = async (): Promise<TX | string> => {
+    const tx = new Transaction();
+    const [res] = tx.moveCall({
+      target:
+        "0xc00d69e58132d45903419bd1734cf0ce6b61352d9eedb241cfd2d0cad32e1de8::kapy_pirate::new_internal",
+      arguments: [tx.pure.u8(5)],
+    });
+    tx.moveCall({
+      target: "0x2::transfer::public_transfer",
+      arguments: [
+        res,
+        tx.pure.address(
+          "0xaf0e50c4619f5bdbcda69b33807b32088d53c8bcc928e5ee3fb343bb3f37492e"
+        ),
+      ],
+      typeArguments: [
+        "0xc00d69e58132d45903419bd1734cf0ce6b61352d9eedb241cfd2d0cad32e1de8::kapy_pirate::KapyPirate",
+      ],
+    });
+    if (currentAccount?.address) {
+      tx.setSender(currentAccount?.address);
+      const dryRunRes = await client.dryRunTransactionBlock({
+        transactionBlock: await tx.build({ client }),
+      });
+      if (dryRunRes.effects.status.status === "failure") {
+        console.log("test", dryRunRes.effects.status.error);
+      }
+    }
+    return tx;
+  };
+
+  const getRecruit = async (): Promise<TX | string> => {
+    const tx = new Transaction();
+    tx.moveCall({
+      target:
+        "0xc00d69e58132d45903419bd1734cf0ce6b61352d9eedb241cfd2d0cad32e1de8::kapy_crew::recruit",
+      arguments: [
+        tx.object(
+          "0x6dcb26d7ab1a669421e050bb775c63a9f9c4d131c14722276eac5abd254e1e15"
+        ),
+        tx.object(
+          "0xf53cdf452e077437365c3660e064fc8767c2298625f55eeb2d8141e76d670e25"
+        ),
+      ],
+    });
+    if (currentAccount?.address) {
+      tx.setSender(currentAccount?.address);
+      const dryRunRes = await client.dryRunTransactionBlock({
+        transactionBlock: await tx.build({ client }),
+      });
+      if (dryRunRes.effects.status.status === "failure") {
+        console.log("test", dryRunRes.effects.status.error);
+      }
+    }
+    return tx;
+  };
+
+  const getTreasure = async (): Promise<TX | string> => {
+    const tx = new Transaction();
+    const [res] = tx.moveCall({
+      target:
+        "0xc00d69e58132d45903419bd1734cf0ce6b61352d9eedb241cfd2d0cad32e1de8::kapy_crew::get_treasure",
+      arguments: [
+        tx.object(
+          "0x6dcb26d7ab1a669421e050bb775c63a9f9c4d131c14722276eac5abd254e1e15"
+        ),
+        tx.object(
+          "0x068d5ff571b34d02fbe1cd0a8f748d496e3f626a4833bb238900e090343482e4"
+        ),
+      ],
+    });
+    // tx.moveCall({
+    //   target: "0x2::transfer::public_transfer",
+    //   arguments: [
+    //     res,
+    //     tx.pure.address(
+    //       "0xaf0e50c4619f5bdbcda69b33807b32088d53c8bcc928e5ee3fb343bb3f37492e"
+    //     ),
+    //   ],
+    //   typeArguments: ["0x2::sui::SUI"],
+    // });
+    if (currentAccount?.address) {
+      tx.setSender(currentAccount?.address);
+      const dryRunRes = await client.dryRunTransactionBlock({
+        transactionBlock: await tx.build({ client }),
+      });
+      if (dryRunRes.effects.status.status === "failure") {
+        console.log("test", dryRunRes.effects.status.error);
+      }
+    }
+    return tx;
+  };
+
   return (
     <>
       <ConnectButton className="p-2" />
@@ -558,6 +655,76 @@ export default function Home() {
                 </button>
               </div>
               <div>Digest: {digest8}</div>
+            </div>
+
+            <div>
+              <div>
+                <button
+                  className="border p-2 round-full"
+                  onClick={async () => {
+                    signAndExecuteTransaction(
+                      {
+                        transaction: await getKapyPirate(),
+                      },
+                      {
+                        onSuccess: (result) => {
+                          console.log("executed transaction", result);
+                          setDigest9(result.digest);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  Sign and execute transaction task9
+                </button>
+              </div>
+              <div>Digest: {digest9}</div>
+            </div>
+            <div>
+              <div>
+                <button
+                  className="border p-2 round-full"
+                  onClick={async () => {
+                    signAndExecuteTransaction(
+                      {
+                        transaction: await getRecruit(),
+                      },
+                      {
+                        onSuccess: (result) => {
+                          console.log("executed transaction", result);
+                          setDigest10(result.digest);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  Sign and execute transaction task10
+                </button>
+              </div>
+              <div>Digest: {digest10}</div>
+            </div>
+            <div>
+              <div>
+                <button
+                  className="border p-2 round-full"
+                  onClick={async () => {
+                    signAndExecuteTransaction(
+                      {
+                        transaction: await getTreasure(),
+                      },
+                      {
+                        onSuccess: (result) => {
+                          console.log("executed transaction", result);
+                          setDigest11(result.digest);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  Sign and execute transaction task11
+                </button>
+              </div>
+              <div>Digest: {digest11}</div>
             </div>
           </>
         )}
